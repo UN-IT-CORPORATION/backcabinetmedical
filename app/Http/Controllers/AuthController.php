@@ -59,6 +59,8 @@ class AuthController extends Controller
         ]);
     }
 
+    
+
     /**
      * Déconnexion
      */
@@ -70,4 +72,22 @@ class AuthController extends Controller
             'message' => 'Déconnexion réussie',
         ]);
     }
+
+    public function checkUser(Request $request)
+    {
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json(['message' => 'Aucun utilisateur connecté'], 401);
+        }
+
+        return response()->json([
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+            ]
+        ]);
+    }
+
 }
