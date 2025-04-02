@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Medecin;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
@@ -28,19 +29,29 @@ class MedecinController extends Controller
                 'password' => 'required|string|min:6|confirmed',
             ]);
 
-            // Création du médecin avec le mot de passe haché
+            // Récupérer l'ID du rôle Médecin
+            $role = Role::where('name', 'Médecin')->first();
+
+            if (!$role) {
+                return response()->json([
+                    'message' => 'Le rôle "Médecin" est introuvable',
+                ], 500);
+            }
+
+            // Création du médecin avec le mot de passe haché et rôle Médecin
             $medecin = Medecin::create([
                 'nom' => $validated['nom'],
                 'specialite' => $validated['specialite'],
                 'telephone' => $validated['telephone'],
                 'email' => $validated['email'],
                 'password' => bcrypt($validated['password']),
+                'role_id' => 3,  // Associer le rôle 'Médecin'
             ]);
 
             return response()->json([
                 'message' => 'Médecin ajouté avec succès',
                 'medecin' => $medecin
-            ], 201);
+            ], 201); // 201 pour "Created"
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Erreur lors de la création du médecin: ' . $e->getMessage());
             return response()->json([

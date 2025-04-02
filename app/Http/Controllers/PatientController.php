@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Patient;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -11,6 +12,7 @@ class PatientController extends Controller
     public function store(Request $request)
     {
         try {
+            // Validation des données
             $validated = $request->validate([
                 'nom' => 'required|string|max:255',
                 'adresse' => 'required|string|max:255',
@@ -19,9 +21,23 @@ class PatientController extends Controller
                 'date_naissance' => 'required|date',
             ]);
             
+            // Récupérer l'ID du rôle 'Utilisateur'
+            $role = Role::where('name', 'Utilisateur')->first();
+
+            if (!$role) {
+                return response()->json([
+                    'message' => 'Le rôle "Utilisateur" est introuvable',
+                ], 500);
+            }
+
+            // Ajouter le role_id au tableau des données
+            $patientData = $request->all();
+            $patientData['role_id'] = 2;  // Associer le rôle 'Utilisateur' à ce patient
+
             \Illuminate\Support\Facades\Log::info('Données validées:', $validated);
             
-            $patient = Patient::create($request->all());
+            // Création du patient avec le rôle
+            $patient = Patient::create($patientData);
             \Illuminate\Support\Facades\Log::info('Patient créé:', $patient->toArray());
             
             return response()->json([
@@ -37,9 +53,10 @@ class PatientController extends Controller
         }
     }
 
-        public function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
         try {
+            // Validation des données
             $validated = $request->validate([
                 'nom' => 'sometimes|string|max:255',
                 'adresse' => 'sometimes|string|max:255',
@@ -50,6 +67,7 @@ class PatientController extends Controller
 
             \Illuminate\Support\Facades\Log::info('Données validées pour modification:', $validated);
 
+            // Trouver le patient et mettre à jour les données
             $patient = Patient::findOrFail($id);
             $patient->update($validated);
 
@@ -68,7 +86,7 @@ class PatientController extends Controller
         }
     }
 
-        public function destroy($id)
+    public function destroy($id)
     {
         try {
             $patient = Patient::findOrFail($id);
@@ -88,7 +106,4 @@ class PatientController extends Controller
             ], 500);
         }
     }
-
-
-    
 }
