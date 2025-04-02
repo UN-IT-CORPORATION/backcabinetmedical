@@ -10,6 +10,9 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [AuthController::class, 'checkUser']);
     Route::post('/patients', [PatientController::class, 'store']);
+    Route::put('/patients/{id}', [PatientController::class, 'update']);  // Modifier un patient
+    Route::delete('/patients/{id}', [PatientController::class, 'destroy']); //Supprimer un Patient
+
 
 });
 
