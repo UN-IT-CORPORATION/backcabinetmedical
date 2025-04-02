@@ -2,9 +2,10 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,13 +14,18 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create test users with factory if needed
-        // User::factory(10)->create();
+        // Exécuter le RoleSeeder d'abord
+        $this->call(RoleSeeder::class);
 
-        // Create a specific admin/test user
+        // Récupérer l'ID du rôle "Admin"
+        $adminRole = DB::table('roles')->where('name', 'Admin')->first();
+
+        // Créer un utilisateur admin avec le rôle récupéré
         User::create([
+            'name' => 'Admin2',
             'email' => 'admin2@gmail.com',
             'password' => Hash::make('1234'),
+            'role_id' => $adminRole ? $adminRole->id : null, // Vérification si le rôle existe
         ]);
     }
 }
