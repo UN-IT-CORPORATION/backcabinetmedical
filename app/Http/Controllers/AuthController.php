@@ -48,14 +48,16 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required',
         ]);
+    
 
+    
         if (!Auth::attempt($request->only('email', 'password'))) {
             return response()->json(['message' => 'Identifiants incorrects'], 401);
         }
-
+    
         $user = User::find(Auth::id());
         $token = $user->createToken('auth_token')->plainTextToken;
-
+    
         return response()->json([
             'message' => 'Connexion réussie',
             'user' => [
@@ -67,7 +69,7 @@ class AuthController extends Controller
             'token' => $token,
         ]);
     }
-
+    
     
 
     /**

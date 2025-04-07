@@ -18,7 +18,8 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+   'domain' => env('SESSION_DOMAIN', null),
+
 
     /*
     |--------------------------------------------------------------------------
@@ -168,8 +169,9 @@ return [
     | the cookie from being sent to you when it can't be done securely.
     |
     */
+        'same_site' => 'none',
+        'secure' => env('SESSION_SECURE_COOKIE', false),
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
 
     /*
     |--------------------------------------------------------------------------
