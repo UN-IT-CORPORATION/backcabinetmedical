@@ -18,8 +18,7 @@ return [
     |
     */
 
-   'domain' => env('SESSION_DOMAIN', null),
-
+    'driver' => env('SESSION_DRIVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,7 +32,7 @@ return [
     |
     */
 
-    'lifetime' => (int) env('SESSION_LIFETIME', 120),
+    'lifetime' => env('SESSION_LIFETIME', 120),
 
     'expire_on_close' => env('SESSION_EXPIRE_ON_CLOSE', false),
 
@@ -169,9 +168,8 @@ return [
     | the cookie from being sent to you when it can't be done securely.
     |
     */
-        'same_site' => 'none',
-        'secure' => env('SESSION_SECURE_COOKIE', false),
 
+    'secure' => env('SESSION_SECURE_COOKIE'),
 
     /*
     |--------------------------------------------------------------------------

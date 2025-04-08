@@ -2,21 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Notifications\VerifyApiEmail;
 
-class User extends Authenticatable
+class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable;
-
-    /**
-     * Charger automatiquement le rôle avec l'utilisateur.
-     */
-    protected $with = ['role'];
 
     /**
      * The attributes that are mass assignable.
@@ -25,13 +21,19 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'prenom',
         'email',
         'password',
+        'numeroTelephone',
+        'date_naissance',
+        'adresse',
+        'specialité',
+        'emploi',
         'role_id',
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * The attributes that should be hidden for arrays and JSON serialization.
      *
      * @var array<int, string>
      */
@@ -41,21 +43,26 @@ class User extends Authenticatable
     ];
 
     /**
-     * The attributes that should be cast.
+     * The attributes that should be cast to native types.
      *
      * @var array<string, string>
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'date_naissance' => 'date',
         'password' => 'hashed',
-        'role_id' => 'integer',
     ];
 
     /**
-     * Relation avec la table roles
+     * Send the custom email verification notification.
      */
-    public function role(): BelongsTo
+    public function sendEmailVerificationNotification(): void
     {
-        return $this->belongsTo(Role::class);
+        $this->notify(new VerifyApiEmail());
     }
+
+    public function role()
+{
+    return $this->belongsTo(Role::class);
+}
 }

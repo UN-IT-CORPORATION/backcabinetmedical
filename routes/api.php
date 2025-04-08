@@ -1,30 +1,38 @@
 <?php
 
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PatientController;
+use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\MedecinController;
 
-// Authentification
-Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+// guest
+Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login'])->name('login');
+Route::get('login/{provider}', [AuthController::class, 'redirectToProvider']);
+Route::get('login/{provider}/callback', [AuthController::class, 'handleProviderCallback']);
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::get('password/reset/{token}', function ($token) {
+    return response()->json(['message' => 'Password reset token received', 'token' => $token]);
+})->name('password.reset');
+Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
+    ->middleware(['signed'])
+    ->name('verification.verify');
 
+
+
+Route::post('/email/resend', [AuthController::class, 'resend']);
+
+
+// Auth
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/users', [AuthController::class, 'checkUser']);
+    Route::get('/user', [AuthController::class, 'profile']);
 
-    // Routes Patients
-    Route::prefix('patients')->group(function () {
-        Route::post('/', [PatientController::class, 'store']);
-        Route::put('/{id}', [PatientController::class, 'update']);
-        Route::delete('/{id}', [PatientController::class, 'destroy']);
-    });
-
-    // Routes Médecins
-    Route::prefix('medecins')->group(function () {
-        Route::post('/', [MedecinController::class, 'store']);
-        Route::put('/{id}', [MedecinController::class, 'update']);
-        Route::delete('/{id}', [MedecinController::class, 'destroy']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['verified']);;
+    
+    Route::post('/email/resend', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+        return response()->json(['message' => 'Verification email sent'], 200);
     });
 });
-

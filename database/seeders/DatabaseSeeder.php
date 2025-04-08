@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
+
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,18 +15,43 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Exécuter le RoleSeeder d'abord
-        $this->call(RoleSeeder::class);
+        // D'abord les rôles
+        $this->call([
+            RoleSeeder::class,
+        ]);
 
-        // Récupérer l'ID du rôle "Admin"
-        $adminRole = DB::table('roles')->where('name', 'Admin')->first();
+        // Récupération du rôle "Admin"
+        $adminRole = Role::where('role', 'Admin')->first();
 
-        // Créer un utilisateur admin avec le rôle récupéré
-        User::create([
-            'name' => 'Admin2',
-            'email' => 'admin2@gmail.com',
-            'password' => Hash::make('1234'),
-            'role_id' => $adminRole ? $adminRole->id : null, // Vérification si le rôle existe
+        // Récupération du rôle "Visiteur" ou autre pour le test
+        $defaultRole = Role::where('role', 'Visiteur')->first();
+
+        // Création de l'utilisateur Admin
+        User::factory()->create([
+            'name' => 'Admin',
+            'prenom' => 'Principal',
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('azerty'),
+            'numeroTelephone' => '0600000000',
+            'adresse' => '1 rue de l\'admin',
+            'date_naissance' => '1990-01-01',
+            'specialité' => 'Informatique',
+            'emploi' => 'Administrateur',
+            'role_id' => $adminRole?->id, // rôle lié via clé étrangère
+        ]);
+
+        // Création d'un utilisateur de test
+        User::factory()->create([
+            'name' => 'Test',
+            'prenom' => 'User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+            'numeroTelephone' => '0700000000',
+            'adresse' => '2 rue du test',
+            'date_naissance' => '1995-05-15',
+            'specialité' => null,
+            'emploi' => null,
+            'role_id' => $defaultRole?->id, // un autre rôle
         ]);
     }
 }
