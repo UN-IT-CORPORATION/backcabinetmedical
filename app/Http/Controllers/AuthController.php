@@ -249,8 +249,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $request->user()->currentAccessToken()->delete();
+    // if (!$request->user()->hasVerifiedEmail()) {
+    //     return response()->json(['message' => 'Email non vérifié.'], 403);
+    // }
 
-        return response()->json(['message' => 'Successfully logged out'], 200);
+    $request->user()->currentAccessToken()->delete();
+
+    return response()->json(['message' => 'Successfully logged out'], 200);
     }
+
 }

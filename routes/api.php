@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ServiceController;
 
 
 // guest
@@ -29,10 +30,17 @@ Route::post('/email/resend', [AuthController::class, 'resend']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'profile']);
 
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware(['verified']);;
-    
+    Route::post('/logout', [AuthController::class, 'logout']);
+
     Route::post('/email/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
         return response()->json(['message' => 'Verification email sent'], 200);
     });
+
+    Route::get('/services', [ServiceController::class, 'index']);
+    Route::post('/services', [ServiceController::class, 'store']);
+    Route::get('/services/{id}', [ServiceController::class, 'show']);
+    Route::put('/services/{id}', [ServiceController::class, 'update']);
+    Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+
 });
