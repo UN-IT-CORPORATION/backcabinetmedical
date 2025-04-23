@@ -194,6 +194,14 @@ class AuthController extends Controller
         ]);
     }
 
+    public function profile(Request $request)
+    {
+    return response()->json([
+        'message' => 'Utilisateur connecté récupéré avec succès',
+        'user' => $request->user()
+    ]);
+    }
+
     public function forgotPassword(Request $request)
     {
         $request->validate([
