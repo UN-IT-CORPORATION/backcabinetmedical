@@ -47,6 +47,7 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
+
 Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {
     Route::get('/',     [DoctorController::class, 'index']);
     Route::get('/{id}', [DoctorController::class, 'show']);
