@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
+use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
 
 
@@ -22,12 +23,9 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
     ->middleware(['signed'])
     ->name('verification.verify');
 
-
-
 Route::post('/email/resend', [AuthController::class, 'resend']);
 
 
-// Auth
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'profile']);
 
@@ -46,11 +44,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
-
-
 Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {
     Route::get('/',     [DoctorController::class, 'index']);
     Route::get('/{id}', [DoctorController::class, 'show']);
     Route::put('/{id}', [DoctorController::class, 'update']);
      Route::delete('/{id}', [DoctorController::class, 'destroy']);
+});
+
+
+Route::middleware('auth:sanctum')->prefix('patients')->group(function () {
+    Route::get('/',     [PatientController::class, 'index']);
+    Route::get('/{id}', [PatientController::class, 'show']);
+    Route::put('/{id}', [PatientController::class, 'update']);
+    Route::delete('/{id}', [PatientController::class, 'destroy']);
 });
