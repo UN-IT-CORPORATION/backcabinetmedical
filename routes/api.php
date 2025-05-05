@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ServiceController;
 
 
@@ -43,4 +44,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 
+});
+
+
+Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {
+    Route::get('/',     [DoctorController::class, 'index']);
+    Route::get('/{id}', [DoctorController::class, 'show']);
+    Route::put('/{id}', [DoctorController::class, 'update']);
+     Route::delete('/{id}', [DoctorController::class, 'destroy']);
 });
