@@ -16,4 +16,9 @@ class Service extends Model
         'details',
         'horaires',
     ];
+
+    public function traitements()
+{
+    return $this->belongsToMany(Traitement::class);
+}
 }

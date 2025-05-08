@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\TraitementController;
 
 
 // guest
@@ -57,4 +58,12 @@ Route::middleware('auth:sanctum')->prefix('patients')->group(function () {
     Route::get('/{id}', [PatientController::class, 'show']);
     Route::put('/{id}', [PatientController::class, 'update']);
     Route::delete('/{id}', [PatientController::class, 'destroy']);
+});
+
+Route::middleware(('auth:sanctum'))->group(function () {
+    Route::get('/traitements', [TraitementController::class, 'index']);
+    Route::post('/traitements', [TraitementController::class, 'store']);
+    Route::get('/traitements/{id}', [TraitementController::class, 'show']);
+    Route::put('/traitements/{id}', [TraitementController::class, 'update']);
+    Route::delete('/traitements/{id}', [TraitementController::class, 'destroy']);
 });
