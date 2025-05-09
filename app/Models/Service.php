@@ -21,4 +21,13 @@ class Service extends Model
 {
     return $this->belongsToMany(Traitement::class);
 }
+
+    public function stocks()
+    {
+        return $this->hasMany(Stock::class);
+    }
+
+
+
+
 }

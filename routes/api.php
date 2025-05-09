@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\StockController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
@@ -66,4 +67,11 @@ Route::middleware(('auth:sanctum'))->group(function () {
     Route::get('/traitements/{id}', [TraitementController::class, 'show']);
     Route::put('/traitements/{id}', [TraitementController::class, 'update']);
     Route::delete('/traitements/{id}', [TraitementController::class, 'destroy']);
+});
+
+Route::middleware('auth:sanctum')->prefix('stocks')->group(function () {
+    Route::get('/',     [StockController::class, 'index']);
+    Route::get('/{id}', [StockController::class, 'show']);
+    Route::put('/{id}', [StockController::class, 'update']);
+    Route::delete('/{id}', [StockController::class, 'destroy']);
 });
