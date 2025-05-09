@@ -53,6 +53,14 @@ Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {
      Route::delete('/{id}', [DoctorController::class, 'destroy']);
 });
 
+Route::middleware('auth:sanctum')->prefix('stocks')->group(function () {
+    Route::get('/',     [StockController::class, 'index']);
+    Route::post('/',     [StockController::class, 'store']);
+    Route::get('/{id}', [StockController::class, 'show']);
+    Route::put('/{id}', [StockController::class, 'update']);
+    Route::delete('/{id}', [StockController::class, 'destroy']);
+});
+
 
 Route::middleware('auth:sanctum')->prefix('patients')->group(function () {
     Route::get('/',     [PatientController::class, 'index']);
@@ -67,11 +75,4 @@ Route::middleware(('auth:sanctum'))->group(function () {
     Route::get('/traitements/{id}', [TraitementController::class, 'show']);
     Route::put('/traitements/{id}', [TraitementController::class, 'update']);
     Route::delete('/traitements/{id}', [TraitementController::class, 'destroy']);
-});
-
-Route::middleware('auth:sanctum')->prefix('stocks')->group(function () {
-    Route::get('/',     [StockController::class, 'index']);
-    Route::get('/{id}', [StockController::class, 'show']);
-    Route::put('/{id}', [StockController::class, 'update']);
-    Route::delete('/{id}', [StockController::class, 'destroy']);
 });
