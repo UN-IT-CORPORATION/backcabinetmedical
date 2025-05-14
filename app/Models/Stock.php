@@ -10,7 +10,9 @@ class Stock extends Model
         'nom',
         'quantite_total',
         'quantite_carton',
+        'prix',
         'service_id',
+
     ];
 
     public function service()
@@ -21,4 +23,11 @@ class Stock extends Model
     {
         return $query->where('quantite_total', '>=', $min);
     }
+
+    public function consultations()
+{
+    return $this->belongsToMany(Consultation::class, 'consultation_stock')
+                ->withPivot('prix')
+                ->withTimestamps();
+}
 }

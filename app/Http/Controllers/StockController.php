@@ -25,6 +25,7 @@ class StockController extends Controller
             'nom' => 'required|string|max:255',
             'quantite_total' => 'required|integer|min:0',
             'quantite_carton' => 'required|integer|min:0',
+            'prix'=>'required|integer|min:0',
             'service_id' => 'required|exists:services,id',
         ]);
 
@@ -39,6 +40,7 @@ class StockController extends Controller
             'nom' => 'sometimes|required|string|max:255',
             'quantite_total' => 'sometimes|required|integer|min:0',
             'quantite_carton' => 'sometimes|required|integer|min:0',
+            'prix'=>'required|integer|min:0',
             'service_id' => 'sometimes|required|exists:services,id',
         ]);
 

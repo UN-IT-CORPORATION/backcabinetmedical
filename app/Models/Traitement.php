@@ -28,4 +28,11 @@ class Traitement extends Model
     {
         return $query->where('prix', '<=', $max);
     }
+
+    public function consultations()
+{
+    return $this->belongsToMany(Consultation::class, 'consultation_traitement')
+                ->withPivot('prix')
+                ->withTimestamps();
+}
 }

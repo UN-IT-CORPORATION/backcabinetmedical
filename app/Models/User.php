@@ -65,4 +65,8 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
 {
     return $this->belongsTo(Role::class);
 }
+public function consultations()
+{
+    return $this->hasMany(Consultation::class);
+}
 }

@@ -9,6 +9,7 @@ use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TraitementController;
+use App\Http\Controllers\ConsultationController;
 
 
 // guest
@@ -36,6 +37,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/email/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
         return response()->json(['message' => 'Verification email sent'], 200);
+    });
+
+    Route::middleware('auth:sanctum')->prefix('consultations')->group(function () {
+        Route::post('/', [ConsultationController::class, 'store']);
+        Route::get('/', [ConsultationController::class, 'index']);
+        Route::get('/patients/{id}/consultations', [ConsultationController::class, 'getByPatient']);
     });
 
     Route::get('/services', [ServiceController::class, 'index']);
