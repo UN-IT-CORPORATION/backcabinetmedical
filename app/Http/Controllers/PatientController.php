@@ -60,4 +60,22 @@ class PatientController extends Controller
 
         return response()->json(['message' => 'Patient supprimé avec succès'], 200);
     }
+
+    public function search(Request $request)
+{
+    $query = $request->get('q');
+
+
+    $patients = User::where('role_id', 4)
+        ->where(function ($q) use ($query) {
+            $q->where('name', 'LIKE', "%{$query}%")
+              ->orWhere('email', 'LIKE', "%{$query}%")
+              ->orWhere('numeroTelephone', 'LIKE', "%{$query}%");
+        })
+        ->limit(10)
+        ->get();
+
+    return response()->json($patients);
+}
+
 }

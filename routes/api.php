@@ -63,10 +63,12 @@ Route::middleware('auth:sanctum')->prefix('stocks')->group(function () {
 
 
 Route::middleware('auth:sanctum')->prefix('patients')->group(function () {
+    Route::get('/search', [PatientController::class, 'search']);
     Route::get('/',     [PatientController::class, 'index']);
     Route::get('/{id}', [PatientController::class, 'show']);
     Route::put('/{id}', [PatientController::class, 'update']);
     Route::delete('/{id}', [PatientController::class, 'destroy']);
+
 });
 
 Route::middleware(('auth:sanctum'))->group(function () {
