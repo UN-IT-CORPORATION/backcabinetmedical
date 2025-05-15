@@ -39,4 +39,10 @@ class Consultation extends Model
     {
         return $this->hasMany(Paiement::class);
     }
+
+    public function antecedents()
+    {
+        return $this->belongsToMany(Antecedent::class, 'consultation_antecedent')
+                    ->withTimestamps();
+    }
 }

@@ -1,152 +1,185 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Stock;
 use App\Models\Traitement;
+use App\Models\Antecedent;
 use App\Models\Consultation;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
 
 class ConsultationController extends Controller
 {
+    /* POST /api/consultations */
     public function store(Request $request)
     {
-
+        /* ─────────── Validation ─────────── */
         $data = $request->validate([
-            'patient' => ['required', 'array'],
-            'patient.name' => 'required|string|max:100',
-            'patient.prenom' => 'required|string|max:100',
-            'patient.email' => 'required|email',
-            'patient.password' => 'required|string|min:8|confirmed',
-            'patient.role_id' => 'required|integer|in:4',
+            /* --- Patient --- */
+            'patient'                 => ['required','array'],
+            'patient.name'            => 'required|string|max:100',
+            'patient.prenom'          => 'required|string|max:100',
+            'patient.email'           => 'required|email',
+            'patient.password'        => 'required|string|min:8|confirmed',
+            'patient.role_id'         => 'required|integer|in:4',
             'patient.numeroTelephone' => 'nullable|string|max:20',
-            'patient.date_naissance' => 'nullable|date',
-            'patient.adresse' => 'nullable|string|max:255',
-            'patient.specialité' => 'nullable|string|max:255',
+            'patient.date_naissance'  => 'nullable|date',
+            'patient.adresse'         => 'nullable|string|max:255',
+            'patient.specialité'      => 'nullable|string|max:255',
 
+            /* --- Consultation --- */
             'date_consultation' => 'required|date',
-            'nb_seances' => 'required|integer|min:1',
-            'observation' => 'nullable|string',
-            'temperature' => 'nullable|numeric|between:25,45',
-            'tension'     => 'nullable|string|max:15',
-            'traitements' => 'required|array|min:1',
-            'traitements.*' => 'integer|exists:traitements,id',
-            'produits' => 'nullable|array',
-            'produits.*' => 'integer|exists:stocks,id',
-            'paiements' => 'nullable|array',
-            'paiements.*.montant' => 'required|numeric',
-            'paiements.*.date' => 'required|date',
-        ]);
-        DB::enableQueryLog();
-        DB::beginTransaction();
+            'nb_seances'        => 'required|integer|min:1',
+            'observation'       => 'nullable|string',
+            'temperature'       => 'nullable|numeric|between:25,45',
+            'tension'           => 'nullable|string|max:15',
 
+            /* --- Antécédents --- */
+            'antecedents'               => 'nullable|array',
+            'antecedents.*.id'          => 'nullable|integer',                // plus de "exists"
+            'antecedents.*.titre'       => 'required_without:antecedents.*.id|string|max:255',
+            'antecedents.*.description' => 'nullable|string',
+
+            /* --- Actes & Produits --- */
+            'traitements'   => 'required|array|min:1',
+            'traitements.*' => 'integer|exists:traitements,id',
+            'produits'      => 'nullable|array',
+            'produits.*'    => 'integer|exists:stocks,id',
+
+            /* --- Paiements --- */
+            'paiements'         => 'nullable|array',
+            'paiements.*.montant'=> 'required|numeric',
+            'paiements.*.date'   => 'required|date',
+        ]);
+
+        DB::beginTransaction();
         try {
-            // Vérifie si le patient existe déjà (par email ou téléphone)
-            $patient = User::where('role_id', 4)
-                ->where(function ($q) use ($data) {
-                    $q->where('email', $data['patient']['email'])
-                      ->orWhere('numeroTelephone', $data['patient']['numeroTelephone']);
-                })
-                ->first();
+            /* ---------- Patient ---------- */
+            $patient = User::where('role_id',4)
+                ->where(function ($q) use ($data){
+                    $q->where('email',$data['patient']['email'])
+                      ->orWhere('numeroTelephone',$data['patient']['numeroTelephone']);
+                })->first();
 
             if (!$patient) {
                 $patient = User::create([
-                    'name' => $data['patient']['name'],
-                    'prenom' => $data['patient']['prenom'],
-                    'email' => $data['patient']['email'],
-                    'password' => Hash::make($data['patient']['password']),
-                    'role_id' => $data['patient']['role_id'],
+                    'name'            => $data['patient']['name'],
+                    'prenom'          => $data['patient']['prenom'],
+                    'email'           => $data['patient']['email'],
+                    'password'        => Hash::make($data['patient']['password']),
+                    'role_id'         => 4,
                     'numeroTelephone' => $data['patient']['numeroTelephone'] ?? null,
-                    'date_naissance' => $data['patient']['date_naissance'] ?? null,
-                    'adresse' => $data['patient']['adresse'] ?? null,
-                    'specialité' => $data['patient']['specialité'] ?? null,
+                    'date_naissance'  => $data['patient']['date_naissance']  ?? null,
+                    'adresse'         => $data['patient']['adresse']         ?? null,
+                    'specialité'      => $data['patient']['specialité']      ?? null,
                 ]);
             }
 
-            // Créer consultation
+            /* ---------- Consultation ---------- */
             $consultation = Consultation::create([
-                'user_id' => $patient->id,
-                'date_consultation' => $data['date_consultation'],
-                'nb_seances' => $data['nb_seances'],
-                'total' => 0,
-                'observation'      => $data['observation']  ?? null,
-                'temperature'      => $data['temperature']  ?? null,
-                'tension'          => $data['tension']      ?? null,
+                'user_id'          => $patient->id,
+                'date_consultation'=> $data['date_consultation'],
+                'nb_seances'       => $data['nb_seances'],
+                'total'            => 0,
+                'observation'      => $data['observation'] ?? null,
+                'temperature'      => $data['temperature'] ?? null,
+                'tension'          => $data['tension']     ?? null,
             ]);
 
             $total = 0;
 
-            // Attacher traitements
+            /* ---------- Traitements ---------- */
             foreach ($data['traitements'] as $id) {
-                $traitement = Traitement::findOrFail($id);
-                $consultation->traitements()->attach($traitement->id, ['prix' => $traitement->prix]);
-                $total += $traitement->prix;
+                $t = Traitement::findOrFail($id);
+                $consultation->traitements()->attach($t->id,['prix'=>$t->prix]);
+                $total += $t->prix;
             }
 
-            // Attacher stocks (produits)
+            /* ---------- Produits / Stocks ---------- */
             if (!empty($data['produits'])) {
                 foreach ($data['produits'] as $id) {
-                    $stock = Stock::findOrFail($id);
-                    $consultation->produits()->attach($stock->id, ['prix' => $stock->prix ?? 0]);
-                    $total += $stock->prix ?? 0;
+                    $s = Stock::findOrFail($id);
+                    $consultation->produits()->attach($s->id,['prix'=>$s->prix ?? 0]);
+                    $total += $s->prix ?? 0;
                 }
             }
 
-            // Paiements
+            /* ---------- Antécédents ---------- */
+            if (!empty($data['antecedents'])) {
+                foreach ($data['antecedents'] as $ant) {
+                    // 1) on tente de récupérer l’antécédent si ID fourni
+                    $a = null;
+                    if (isset($ant['id'])) {
+                        $a = Antecedent::where('user_id',$patient->id)->find($ant['id']);
+                    }
+                    // 2) si aucun ID ou ID introuvable → on crée
+                    if (!$a) {
+                        $a = $patient->antecedents()->create([
+                            'titre'       => $ant['titre'],
+                            'description' => $ant['description'] ?? null,
+                        ]);
+                    }
+                    // 3) on relie à la consultation
+                    $consultation->antecedents()->attach($a->id);
+                }
+            }
+
+            /* ---------- Paiements ---------- */
             if (!empty($data['paiements'])) {
-                foreach ($data['paiements'] as $paiement) {
+                foreach ($data['paiements'] as $p) {
                     $consultation->paiements()->create([
-                        'montant' => $paiement['montant'],
-                        'date_paiement' => $paiement['date']
+                        'montant'       => $p['montant'],
+                        'date_paiement' => $p['date'],
                     ]);
                 }
             }
 
-            $consultation->update(['total' => $total]);
-
+            $consultation->update(['total'=>$total]);
             DB::commit();
-            Log::info(DB::getQueryLog());
-
 
             return response()->json([
-                'message' => 'Consultation enregistrée avec succès',
-                'consultation' => $consultation->load('patient', 'traitements', 'produits', 'paiements')
-            ], 201);
-        } catch (\Exception $e) {
+                'message'      => 'Consultation enregistrée avec succès',
+                'consultation' => $consultation->load(
+                    'patient','traitements','produits','paiements','antecedents'
+                )
+            ],201);
+
+        } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json([
-                'error' => 'Erreur lors de la création de la consultation',
-                'message' => $e->getMessage()
-            ], 500);
+                'error'   => 'Erreur lors de la création de la consultation',
+                'message' => $e->getMessage(),
+            ],500);
         }
     }
 
+    /* GET /api/consultations */
     public function index()
     {
-        $consultations = Consultation::with(['patient', 'traitements', 'produits', 'paiements'])
-                            ->orderBy('date_consultation', 'desc')
-                            ->get();
+        $list = Consultation::with([
+            'patient','traitements','produits','paiements','antecedents'
+        ])->orderByDesc('date_consultation')->get();
 
-        return response()->json([
-            'consultations' => $consultations
-        ]);
+        return response()->json(['consultations'=>$list]);
     }
 
-    /**
-     * GET /api/patients/{id}/consultations
-     * Récupérer un patient + ses consultations
-     */
+    /* GET /api/patients/{id}/consultations */
     public function getByPatient($id)
     {
-        $patient = User::where('role_id', 4)->with(['consultations.traitements', 'consultations.produits', 'consultations.paiements'])->findOrFail($id);
+        $patient = User::where('role_id',4)->with([
+            'antecedents',
+            'consultations.traitements',
+            'consultations.produits',
+            'consultations.paiements',
+            'consultations.antecedents',
+        ])->findOrFail($id);
 
         return response()->json([
-            'patient' => $patient,
+            'patient'       => $patient,
             'consultations' => $patient->consultations
         ]);
     }

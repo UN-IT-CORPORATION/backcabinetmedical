@@ -69,4 +69,9 @@ public function consultations()
 {
     return $this->hasMany(Consultation::class);
 }
+
+public function antecedents()
+{
+    return $this->hasMany(Antecedent::class);
+}
 }
