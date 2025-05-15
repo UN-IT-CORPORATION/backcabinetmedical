@@ -31,6 +31,9 @@ class ConsultationController extends Controller
 
             'date_consultation' => 'required|date',
             'nb_seances' => 'required|integer|min:1',
+            'observation' => 'nullable|string',
+            'temperature' => 'nullable|numeric|between:25,45',
+            'tension'     => 'nullable|string|max:15',
             'traitements' => 'required|array|min:1',
             'traitements.*' => 'integer|exists:traitements,id',
             'produits' => 'nullable|array',
@@ -71,6 +74,9 @@ class ConsultationController extends Controller
                 'date_consultation' => $data['date_consultation'],
                 'nb_seances' => $data['nb_seances'],
                 'total' => 0,
+                'observation'      => $data['observation']  ?? null,
+                'temperature'      => $data['temperature']  ?? null,
+                'tension'          => $data['tension']      ?? null,
             ]);
 
             $total = 0;

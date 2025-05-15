@@ -11,6 +11,9 @@ class Consultation extends Model
         'date_consultation',
         'nb_seances',
         'total',
+        'observation',
+        'temperature',
+        'tension',
     ];
 
     public function patient()
