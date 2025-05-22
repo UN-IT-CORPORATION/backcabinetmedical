@@ -10,7 +10,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TraitementController;
 use App\Http\Controllers\ConsultationController;
-
+use App\Models\Consultation;
 
 // guest
 Route::post('/register', [AuthController::class, 'register']);
@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [ConsultationController::class, 'index']);
         Route::get('/patients/{id}/consultations', [ConsultationController::class, 'getByPatient']);
         Route::get('/{id}',[ConsultationController::class,'finishSceance']);
+        Route::get('/addseance/{id}',[ConsultationController::class,'addSceance']);
     });
 
     Route::get('/services', [ServiceController::class, 'index']);

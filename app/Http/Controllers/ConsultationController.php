@@ -81,7 +81,7 @@ class ConsultationController extends Controller
             }
 
             /* ---------- Consultation ---------- */
-            $seancerestant = $data['seancerestant'] ?? 1;
+            $seancerestant = $data['nb_seances'];
             $consultation = Consultation::create([
                 'user_id'          => $patient->id,
                 'date_consultation'=> $data['date_consultation'],
@@ -176,11 +176,32 @@ class ConsultationController extends Controller
             'patient', 'traitements', 'produits', 'paiements', 'antecedents'
         ])->find($id);
 
+        $consultation->seancerestant='0';
+        $consultation->save();
 
-        dd($consultation->nb_seances);
+        return response()->json(['message'=>'Traitement Terminé']);
 
+    }
 
+    public function addSceance($id){
+        $consultation = Consultation::with([
+            'patient', 'traitements', 'produits', 'paiements', 'antecedents'
+        ])->find($id);
 
+        if($consultation->seancerestant >0){
+            $consultation->seancerestant-=1;
+            $consultation->save();
+
+            return response()->json(
+                [
+                    'message'=>'Sceance mise à jour',
+                     'consultattion_restant'=>$consultation->seancerestant
+        ]);
+
+        }else{
+            return response()->json(['message'=>'Sceance déja complet']);
+        }
+        ;
 
 
     }
