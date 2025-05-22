@@ -34,6 +34,7 @@ class ConsultationController extends Controller
             /* --- Consultation --- */
             'date_consultation' => 'required|date',
             'nb_seances'        => 'required|integer|min:1',
+            'seancerestant' =>'nullable|string',
             'observation'       => 'nullable|string',
             'temperature'       => 'nullable|numeric|between:25,45',
             'tension'           => 'nullable|string|max:15',
@@ -80,10 +81,12 @@ class ConsultationController extends Controller
             }
 
             /* ---------- Consultation ---------- */
+            $seancerestant = $data['seancerestant'] ?? 1;
             $consultation = Consultation::create([
                 'user_id'          => $patient->id,
                 'date_consultation'=> $data['date_consultation'],
                 'nb_seances'       => $data['nb_seances'],
+                'seancerestant'=>$seancerestant,
                 'total'            => 0,
                 'observation'      => $data['observation'] ?? null,
                 'temperature'      => $data['temperature'] ?? null,
@@ -165,6 +168,21 @@ class ConsultationController extends Controller
         ])->orderByDesc('date_consultation')->get();
 
         return response()->json(['consultations'=>$list]);
+    }
+
+    public function finishSceance($id){
+
+        $consultation = Consultation::with([
+            'patient', 'traitements', 'produits', 'paiements', 'antecedents'
+        ])->find($id);
+
+
+        dd($consultation->nb_seances);
+
+
+
+
+
     }
 
     /* GET /api/patients/{id}/consultations */

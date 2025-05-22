@@ -10,6 +10,7 @@ class Consultation extends Model
         'user_id',
         'date_consultation',
         'nb_seances',
+        'seancerestant',
         'total',
         'observation',
         'temperature',

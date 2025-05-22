@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/', [ConsultationController::class, 'store']);
         Route::get('/', [ConsultationController::class, 'index']);
         Route::get('/patients/{id}/consultations', [ConsultationController::class, 'getByPatient']);
+        Route::get('/{id}',[ConsultationController::class,'finishSceance']);
     });
 
     Route::get('/services', [ServiceController::class, 'index']);
