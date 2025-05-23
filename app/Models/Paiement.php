@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Paiement extends Model
 {
-    protected $fillable = ['consultation_id', 'montant', 'date_paiement'];
+    protected $fillable = ['consultation_id', 'montant', 'date_paiement','type'];
 
     public function consultation()
     {

@@ -55,6 +55,7 @@ class ConsultationController extends Controller
             'paiements'         => 'nullable|array',
             'paiements.*.montant'=> 'required|numeric',
             'paiements.*.date'   => 'required|date',
+            'paiements.*.type' =>'required'
         ]);
 
         DB::beginTransaction();
@@ -137,6 +138,7 @@ class ConsultationController extends Controller
                     $consultation->paiements()->create([
                         'montant'       => $p['montant'],
                         'date_paiement' => $p['date'],
+                        'type'           =>$p['type'],
                     ]);
                 }
             }
