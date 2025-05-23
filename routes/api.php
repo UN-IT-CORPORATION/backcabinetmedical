@@ -10,6 +10,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TraitementController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\PaiementController;
 use App\Models\Consultation;
 
 // guest
@@ -45,6 +46,12 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/patients/{id}/consultations', [ConsultationController::class, 'getByPatient']);
         Route::get('/{id}',[ConsultationController::class,'finishSceance']);
         Route::get('/addseance/{id}',[ConsultationController::class,'addSceance']);
+    });
+
+    Route::middleware('auth:sanctum')->prefix('payments')->group(function(){
+     Route::post('/',[PaiementController::class,'paiement']);
+     Route::get('/{id}',[PaiementController::class,'listpayementConsultation']);
+     Route::get('/restant/{id}',[PaiementController::class,'payementrestant']);
     });
 
     Route::get('/services', [ServiceController::class, 'index']);
