@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 use App\Models\User;
 use App\Models\Stock;
-use App\Models\Traitement;
+use App\Models\Paiement;
 use App\Models\Antecedent;
+use App\Models\Traitement;
 use App\Models\Consultation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class ConsultationController extends Controller
 {
@@ -169,7 +170,25 @@ class ConsultationController extends Controller
             'patient','traitements','produits','paiements','antecedents'
         ])->orderByDesc('date_consultation')->get();
 
-        return response()->json(['consultations'=>$list]);
+        foreach ($list as $consultation) {
+            // Somme des paiements
+            $totalPaye = $consultation->paiements->sum('montant');
+
+            // Reste à payer
+            $reste = $consultation->total - $totalPaye;
+            $consultation->payementrestant = $reste;
+
+            // Statut de paiement
+            $consultation->statuspaiement = $reste <= 0 ? 'Payé' : 'En cours';
+
+            // Statut des séances
+            $effectuees = $consultation->nb_seances - $consultation->seancerestant;
+            $consultation->statusseance = $consultation->seancerestant == 0
+                ? 'Complet'
+                : $effectuees . '/' . $consultation->nb_seances;
+        }
+
+        return response()->json(['consultations' => $list]);
     }
 
     public function finishSceance($id){
