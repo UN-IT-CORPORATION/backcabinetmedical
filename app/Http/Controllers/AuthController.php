@@ -29,6 +29,10 @@ class AuthController extends Controller
             'adresse' => 'nullable|string|max:255',
             'specialité' => 'nullable|string|max:255',
             'emploi' => 'nullable|string|max:255',
+
+            'antecedents'               => 'nullable|array',
+            'antecedents.*.titre'       => 'required|string|max:255',
+            'antecedents.*.description' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -54,6 +58,17 @@ class AuthController extends Controller
 
         // Envoi de l'email de vérification
         $user->sendEmailVerificationNotification();
+
+        if ($request->has('antecedents')) {
+            foreach ($request->antecedents as $ant) {
+                $user->antecedents()->create([
+                    'titre'       => $ant['titre'],
+                    'description' => $ant['description'] ?? null,
+                ]);
+            }
+        }
+
+        $user = $user->load('antecedents');
 
         // Création du token d'authentification
         $token = $user->createToken('auth_token')->plainTextToken;
