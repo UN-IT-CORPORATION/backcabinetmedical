@@ -30,6 +30,8 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
         'specialité',
         'emploi',
         'role_id',
+        'organisme',
+        'numerodossierprisenchage'
     ];
 
     /**

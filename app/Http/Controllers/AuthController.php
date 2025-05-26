@@ -29,6 +29,8 @@ class AuthController extends Controller
             'adresse' => 'nullable|string|max:255',
             'specialité' => 'nullable|string|max:255',
             'emploi' => 'nullable|string|max:255',
+            'organisme'=>'nullable|string',
+            'numerodossierprisenchage'=>'nullable|string',
 
             'antecedents'               => 'nullable|array',
             'antecedents.*.titre'       => 'required|string|max:255',
@@ -54,6 +56,8 @@ class AuthController extends Controller
             'adresse' => $request->adresse,
             'specialité' => $request->specialité,
             'emploi' => $request->emploi,
+            'organisme'=>$request->organisme,
+            'numerodossierprisenchage'=>$request->numerodossierprisenchage
         ]);
 
         // Envoi de l'email de vérification

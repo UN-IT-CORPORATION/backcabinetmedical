@@ -43,6 +43,8 @@ class PatientController extends Controller
         'numeroTelephone' => ['sometimes','string','max:30'],
         'adresse'         => ['sometimes','string','max:255'],
         'date_naissance'  => ['sometimes','date'],
+        'organisme'=>'nullable|string',
+        'numerodossierprisenchage'=>'nullable|string',
 
         // antécédents
         'antecedents'               => 'nullable|array',
