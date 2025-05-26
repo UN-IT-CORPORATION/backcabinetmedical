@@ -31,6 +31,8 @@ class ConsultationController extends Controller
             'patient.date_naissance'  => 'nullable|date',
             'patient.adresse'         => 'nullable|string|max:255',
             'patient.specialité'      => 'nullable|string|max:255',
+            'patient.organisme'       =>'nullable|string',
+            'patient.numerodossierprisenchage'=>'nullable|string',
 
             /* --- Consultation --- */
             'date_consultation' => 'required|date',
@@ -68,19 +70,36 @@ class ConsultationController extends Controller
                       ->orWhere('numeroTelephone',$data['patient']['numeroTelephone']);
                 })->first();
 
-            if (!$patient) {
-                $patient = User::create([
-                    'name'            => $data['patient']['name'],
-                    'prenom'          => $data['patient']['prenom'],
-                    'email'           => $data['patient']['email'],
-                    'password'        => Hash::make($data['patient']['password']),
-                    'role_id'         => 4,
-                    'numeroTelephone' => $data['patient']['numeroTelephone'] ?? null,
-                    'date_naissance'  => $data['patient']['date_naissance']  ?? null,
-                    'adresse'         => $data['patient']['adresse']         ?? null,
-                    'specialité'      => $data['patient']['specialité']      ?? null,
-                ]);
-            }
+                if (!$patient) {
+                    // --- Création ---
+                    $patient = User::create([
+                        'name'                         => $data['patient']['name'],
+                        'prenom'                       => $data['patient']['prenom'],
+                        'email'                        => $data['patient']['email'],
+                        'password'                     => Hash::make($data['patient']['password']),
+                        'role_id'                      => 4,
+                        'numeroTelephone'              => $data['patient']['numeroTelephone'] ?? null,
+                        'date_naissance'               => $data['patient']['date_naissance'] ?? null,
+                        'adresse'                      => $data['patient']['adresse'] ?? null,
+                        'specialité'                   => $data['patient']['specialité'] ?? null,
+                        'organisme'                    => $data['patient']['organisme'] ?? null,
+                        'numerodossierprisenchage'     => $data['patient']['numerodossierprisenchage'] ?? null,
+                    ]);
+                } else {
+                    // --- Mise à jour éventuelle ---
+                    $patient->fill([
+                        'name'                         => $data['patient']['name'],
+                        'prenom'                       => $data['patient']['prenom'],
+                        'email'                        => $data['patient']['email'],
+                        'numeroTelephone'              => $data['patient']['numeroTelephone'] ?? $patient->numeroTelephone,
+                        'date_naissance'               => $data['patient']['date_naissance'] ?? $patient->date_naissance,
+                        'adresse'                      => $data['patient']['adresse'] ?? $patient->adresse,
+                        'specialité'                   => $data['patient']['specialité'] ?? $patient->specialité,
+                        'organisme'                    => $data['patient']['organisme'] ?? $patient->organisme,
+                        'numerodossierprisenchage'     => $data['patient']['numerodossierprisenchage'] ?? $patient->numerodossierprisenchage,
+                    ])->save();
+                }
+
 
             /* ---------- Consultation ---------- */
             $seancerestant = $data['nb_seances'];

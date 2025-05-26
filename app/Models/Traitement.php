@@ -10,7 +10,7 @@ class Traitement extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['nom', 'prix'];
+    protected $fillable = ['nom', 'prix','prixprisenchager'];
 
     /* Relations */
     public function services()

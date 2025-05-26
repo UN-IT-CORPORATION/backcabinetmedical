@@ -21,6 +21,7 @@ class TraitementController extends Controller
         $data = $request->validate([
             'nom'      => 'required|string|max:255',
             'prix'     => 'required|numeric|min:0',
+            'prixprisenchager' =>'integer|nullable',
             'services' => 'nullable|array',
             'services.*' => 'integer|exists:services,id',
         ]);
@@ -52,6 +53,7 @@ class TraitementController extends Controller
         $data = $request->validate([
             'nom'      => 'sometimes|required|string|max:255',
             'prix'     => 'sometimes|required|numeric|min:0',
+            'prixprisenchager'=>'integer|nullable',
             'services' => 'nullable|array',
             'services.*' => 'integer|exists:services,id',
         ]);
