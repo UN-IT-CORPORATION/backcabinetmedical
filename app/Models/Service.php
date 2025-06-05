@@ -28,6 +28,12 @@ class Service extends Model
     }
 
 
+    public function rendezvouses()
+    {
+        return $this->hasMany(Rendezvous::class);
+    }
+
+
 
 
 }

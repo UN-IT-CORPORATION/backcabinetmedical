@@ -64,16 +64,23 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
     }
 
     public function role()
-{
+    {
     return $this->belongsTo(Role::class);
-}
-public function consultations()
-{
+    }
+    public function consultations()
+    {
     return $this->hasMany(Consultation::class);
-}
+    }
 
-public function antecedents()
-{
+    public function antecedents()
+    {
     return $this->hasMany(Antecedent::class);
-}
+    }
+
+    public function rendezvouses(){
+     return $this->hasMany(Rendezvous::class);
+    }
+
+
+
 }

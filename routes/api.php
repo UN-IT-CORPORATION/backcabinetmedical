@@ -11,7 +11,9 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TraitementController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\PaiementController;
+use App\Http\Controllers\RendezvousController;
 use App\Models\Consultation;
+use App\Models\Rendezvous;
 
 // guest
 Route::post('/register', [AuthController::class, 'register']);
@@ -61,6 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
 
 });
+
+Route::middleware('auth:sanctum')->prefix('rendezvous')->group(function(){
+    Route::post('/',[RendezvousController::class,'store']);
+   });
 
 Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {
     Route::get('/',     [DoctorController::class, 'index']);
