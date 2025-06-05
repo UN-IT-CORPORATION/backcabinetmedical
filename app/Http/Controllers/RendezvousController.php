@@ -123,9 +123,42 @@ class RendezvousController extends Controller
     }
 
 
-    // $rendezvous=Rendezvous::all();
-
-
   }
+
+
+  public function getByMonth(Request $request)
+{
+    $year = $request->input('year');
+    $month = $request->input('month');
+
+    if (!$year || !$month) {
+        return response()->json([
+            'error' => 'Année et mois requis.'
+        ], 400);
+    }
+
+
+    $start = "{$year}-{$month}-01";
+    $end = date("Y-m-t", strtotime($start));
+
+    try{
+        $rendezvous =Rendezvous::with(['patient', 'service'])
+        ->whereBetween('date', [$start, $end])
+        ->orderBy('date')
+        ->get();
+
+    return response()->json([
+        'rendezvous' => $rendezvous
+    ],200);
+    } catch(\Throwable $e){
+        return response()->json([
+            'error'   => 'Erreur lors de la visualisation',
+            'message' => $e->getMessage(),
+        ],500);
+    }
+
+}
+
+
 
 }
