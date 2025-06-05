@@ -15,9 +15,9 @@ class Rendezvous extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    public function services()
+    public function service()
     {
-        return $this->belongsToMany(Service::class);
+        return $this->belongsTo(Service::class);
     }
 
 }

@@ -85,6 +85,8 @@ class RendezvousController extends Controller
                     'desciption'=>$data['motif']
                 ]);
 
+                DB::commit();
+
                 return response()->json([
                 'message'=>'Enregistrement rendez-vous avec succes',
                 'rendezvous'=>$rendezvous,
@@ -101,8 +103,29 @@ class RendezvousController extends Controller
         ],500);
     }
 
+    }
+
+  public function getAllRendezvous(){
+    try{
+        $rendezvous=Rendezvous::with(['patient','service'])->get();
+
+        return response()->json([
+            'message'=>'Enregistement avec succes',
+             'rendezvous'=>$rendezvous,
+        ],200);
+    } catch(\Throwable $e){
+        return response()->json([
+            'error'   => 'Erreur lors de la visualisation',
+            'message' => $e->getMessage(),
+        ],500);
 
 
     }
+
+
+    // $rendezvous=Rendezvous::all();
+
+
+  }
 
 }
