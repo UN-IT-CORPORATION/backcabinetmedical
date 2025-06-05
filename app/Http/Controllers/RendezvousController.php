@@ -159,6 +159,22 @@ class RendezvousController extends Controller
 
 }
 
+  public function getRendezvousById($id){
 
+    try{
+
+        $rendezvous=Rendezvous::with(['patient','service'])->find($id);
+
+        return response()->json([
+            'rendezvous'=>$rendezvous,
+        ],200);
+    }catch(\Throwable $e){
+        return response()->json([
+            'error'   => 'Erreur lors de la visualisation',
+            'message' => $e->getMessage(),
+        ],500);
+    }
+
+}
 
 }
