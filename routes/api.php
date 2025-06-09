@@ -69,6 +69,7 @@ Route::middleware('auth:sanctum')->prefix('rendezvous')->group(function(){
     Route::get('/',[RendezvousController::class,'getAllRendezvous']);
     Route::post('/bymonth',[RendezvousController::class,'getByMonth']);
     Route::get('/{id}',[RendezvousController::class,'getRendezvousById']);
+    Route::post('/getbydate',[RendezvousController::class,'getRendezvousByDate']);
    });
 
 Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {

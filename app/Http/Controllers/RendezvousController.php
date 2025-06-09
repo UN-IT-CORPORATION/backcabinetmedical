@@ -177,4 +177,32 @@ class RendezvousController extends Controller
 
 }
 
+
+ public function getRendezvousByDate(Request $request){
+
+    $data=$request->validate([
+        'date'=>'date|required'
+    ]);
+
+    try{
+
+        $rendezvous=Rendezvous::where('date',$data['date'])->get();
+
+        return response()->json([
+        'rendezvous'=>$rendezvous
+        ]);
+
+    } catch(\Throwable $e){
+
+        return response()->json([
+            'message'=>"Erreur lors de l'affichage",
+             'error'=>$e->getMessage(),
+        ],500);
+
+    }
+ }
+
+
+
+
 }
