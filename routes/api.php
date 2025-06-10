@@ -10,6 +10,7 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TraitementController;
 use App\Http\Controllers\ConsultationController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\RendezvousController;
 use App\Models\Consultation;
@@ -71,6 +72,18 @@ Route::middleware('auth:sanctum')->prefix('rendezvous')->group(function(){
     Route::get('/{id}',[RendezvousController::class,'getRendezvousById']);
     Route::post('/getbydate',[RendezvousController::class,'getRendezvousByDate']);
    });
+
+
+   Route::middleware('auth:sanctum')->prefix('dashboard')->group(function(){
+
+    Route::get('/totalpatient',[DashboardController::class,'getTotalPatient']);
+    Route::post('/totalRendezvous',[DashboardController::class,'getTotalRendezvousByDate']);
+    Route::get('revenue-daily', [DashboardController::class, 'revenueDaily']);
+    Route::get('revenue-monthly', [DashboardController::class, 'revenueMonthly']);
+    Route::get('patients/recents', [DashboardController::class, 'derniersPatients']);
+
+   });
+
 
 Route::middleware('auth:sanctum')->prefix('doctors')->group(function () {
     Route::get('/',     [DoctorController::class, 'index']);
