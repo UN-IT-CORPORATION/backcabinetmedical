@@ -16,7 +16,7 @@ class PaiementController extends Controller
     $consultation=Consultation::find($id);
     $montantTotalTraitement=$consultation->total;
 
-    if($request->montant<$montantTotalTraitement){
+    if($request->montant<=$montantTotalTraitement){
 
      $data=$request->validate([
         'consultation_id'=>'required',
