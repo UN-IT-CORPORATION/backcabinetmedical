@@ -34,7 +34,7 @@ Route::post('/email/resend', [AuthController::class, 'resend']);
 
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::get('/user', [AuthController::class, 'profile']);
+    Route::get('/checkuser', [AuthController::class, 'profile']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
