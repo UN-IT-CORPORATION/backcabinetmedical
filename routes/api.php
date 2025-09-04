@@ -13,6 +13,7 @@ use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PaiementController;
 use App\Http\Controllers\RendezvousController;
+use App\Http\Controllers\PhotoController;
 use App\Models\Consultation;
 use App\Models\Rendezvous;
 
@@ -32,15 +33,15 @@ Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verify'])
 
 Route::post('/email/resend', [AuthController::class, 'resend']);
 
-
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/checkuser', [AuthController::class, 'profile']);
-
+    Route::post('/users-update/{id}', [AuthController::class, 'update']); // Changed to match frontend URL
     Route::post('/logout', [AuthController::class, 'logout']);
 
     Route::post('/email/resend', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
         return response()->json(['message' => 'Verification email sent'], 200);
+    
     });
 
     Route::middleware('auth:sanctum')->prefix('consultations')->group(function () {
@@ -62,6 +63,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/services/{id}', [ServiceController::class, 'show']);
     Route::put('/services/{id}', [ServiceController::class, 'update']);
     Route::delete('/services/{id}', [ServiceController::class, 'destroy']);
+
+    Route::middleware('auth:sanctum')->prefix('photos')->group(function () {
+    Route::post('/upload', [PhotoController::class, 'upload']);
+    Route::get('/{type}/{id}', [PhotoController::class, 'listByOwner']); // type = user/patient
+    Route::delete('/{id}', [PhotoController::class, 'delete']);
+    });
 
 });
 

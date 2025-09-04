@@ -31,7 +31,8 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
         'emploi',
         'role_id',
         'organisme',
-        'numerodossierprisenchage'
+        'numerodossierprisenchage',
+        'photo'
     ];
 
     /**
@@ -54,6 +55,23 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
         'date_naissance' => 'date',
         'password' => 'hashed',
     ];
+
+    /**
+     * The attributes that should be appended to the model's array form.
+     *
+     * @var array<int, string>
+     */
+    protected $appends = ['photo_url'];
+
+    /**
+     * Get the URL of the user's photo.
+     *
+     * @return string|null
+     */
+    public function getPhotoUrlAttribute()
+    {
+        return $this->photo ? asset('storage/photos/' . $this->photo) : null;
+    }
 
     /**
      * Send the custom email verification notification.
@@ -79,6 +97,15 @@ class User extends Authenticatable implements CanResetPassword, MustVerifyEmail
 
     public function rendezvouses(){
      return $this->hasMany(Rendezvous::class);
+    }
+    public function photos()
+    {
+        return $this->morphMany(Photo::class, 'photoable');
+    }
+
+    public function profilePhoto()
+    {
+        return $this->morphOne(Photo::class, 'photoable')->where('category', 'profile');
     }
 
 

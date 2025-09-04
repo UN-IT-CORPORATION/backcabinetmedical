@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Laravel\Socialite\Facades\Socialite;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
 {
@@ -22,7 +23,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:100',
             'prenom' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
             'role_id' => 'required|exists:roles,id',
             'numeroTelephone' => 'nullable|string|max:20',
             'date_naissance' => 'nullable|date',
@@ -35,6 +36,7 @@ class AuthController extends Controller
             'antecedents'               => 'nullable|array',
             'antecedents.*.titre'       => 'required|string|max:255',
             'antecedents.*.description' => 'nullable|string',
+            'photo'  => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
 
         if ($validator->fails()) {
@@ -43,7 +45,6 @@ class AuthController extends Controller
                 'errors' => $validator->errors()
             ], 422);
         }
-
         // Création de l'utilisateur
         $user = User::create([
             'name' => $request->name,
@@ -57,9 +58,17 @@ class AuthController extends Controller
             'specialité' => $request->specialité,
             'emploi' => $request->emploi,
             'organisme'=>$request->organisme,
-            'numerodossierprisenchage'=>$request->numerodossierprisenchage
+            'numerodossierprisenchage'=>$request->numerodossierprisenchage,
         ]);
+        
+                // 🔹 Gestion de la photo
+        if ($request->hasFile('photo')) {
+            $filename = time() . '.' . $request->photo->getClientOriginalExtension();
+            $request->photo->storeAs('photos', $filename, 'public');
+            $user->photo = $filename;
+        }
 
+        $user->save();
         // Envoi de l'email de vérification
         $user->sendEmailVerificationNotification();
 
@@ -277,5 +286,52 @@ class AuthController extends Controller
 
     return response()->json(['message' => 'Successfully logged out'], 200);
     }
+
+public function update(Request $request, $id)
+{
+    $user = User::findOrFail($id);
+
+    $validator = Validator::make($request->all(), [
+        'name'   => 'sometimes|string|max:100',
+        'prenom' => 'sometimes|string|max:100',
+        'email'  => 'sometimes|email|unique:users,email,' . $id,
+        'photo'  => 'sometimes|image|mimes:jpg,jpeg,png'
+    ]);
+
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 422);
+    }
+
+    // Mise à jour des champs simples
+    $user->fill($request->except('photo'));
+
+    // 🔹 Gestion de la photo
+    if ($request->hasFile('photo')) {
+        
+        // Supprimer l’ancienne photo si elle existe
+        if ($user->photo && \Storage::disk('public')->exists('photos/' . $user->photo)) {
+            \Storage::disk('public')->delete('photos/' . $user->photo);
+        }
+
+        // Générer un nouveau nom unique
+        $filename = time() . '.' . $request->photo->getClientOriginalExtension();
+
+        // Sauvegarder dans storage/app/public/photos
+        $request->photo->storeAs('photos', $filename, 'public');
+
+        // Enregistrer dans la base
+        $user->photo = $filename;
+    }
+
+    $user->save();
+
+    return response()->json([
+        'success'   => true,
+        'message'   => 'Utilisateur mis à jour avec succès',
+        'user'      => $user->fresh(), // récupère avec le champ appends
+    ]);
+}
+
+
 
 }
