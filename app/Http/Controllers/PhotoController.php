@@ -4,24 +4,32 @@ namespace App\Http\Controllers;
 
 use App\Models\Photo;
 use App\Models\User;
-use App\Models\Patient;
+use App\Models\Consultation; // ✅ Import ajouté
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class PhotoController extends Controller
 {
-    // 📌 Upload multiple photos (profil ou médicale)
+    // Upload multiple photos (profil ou médicale)
     public function upload(Request $request)
     {
         $request->validate([
             'photoable_id'   => 'required|integer',
-            'photoable_type' => 'required|string|in:User,Patient',
+            'photoable_type' => 'required|string|in:User,Consultation',
             'category'       => 'required|string|in:profile,medical',
-            'photos.*'       => 'required|image|mimes:jpg,jpeg,png', // multiple photos
+            'photos.*'       => 'required|image|mimes:jpg,jpeg,png',
             'photo_type'     => 'nullable|string|max:255',
             'upload_date'    => 'nullable|date',
             'description'    => 'nullable|string',
         ]);
+
+        // Vérifier que la consultation existe si c’est une photo de consultation
+        if ($request->photoable_type === 'Consultation') {
+            $consultation = Consultation::find($request->photoable_id);
+            if (!$consultation) {
+                return response()->json(['error' => 'Consultation non trouvée'], 404);
+            }
+        }
 
         $uploadedPhotos = [];
 
@@ -30,13 +38,14 @@ class PhotoController extends Controller
                 $path = $file->store('photos', 'public');
 
                 $photo = Photo::create([
-                    'photoable_id'   => $request->photoable_id,
-                    'photoable_type' => "App\\Models\\" . $request->photoable_type,
-                    'category'       => $request->category,
-                    'photo_type'     => $request->photo_type,
-                    'file_path'      => '/storage/' . $path,
-                    'upload_date'    => $request->upload_date ?? now(),
-                    'description'    => $request->description,
+                    'photoable_id'    => $request->photoable_id,
+                    'photoable_type'  => "App\\Models\\" . $request->photoable_type,
+                    'consultation_id' => $request->photoable_type === 'Consultation' ? $request->photoable_id : null,
+                    'category'        => $request->category,
+                    'photo_type'      => $request->photo_type,
+                    'file_path'       => '/storage/' . $path,
+                    'upload_date'     => $request->upload_date ?? now(),
+                    'description'     => $request->description,
                 ]);
 
                 $uploadedPhotos[] = $photo;
@@ -50,7 +59,8 @@ class PhotoController extends Controller
         ], 201);
     }
 
-    // 📌 Lister les photos d’un User ou Patient
+
+    // Lister les photos d’un User ou Consultation
     public function listByOwner($type, $id)
     {
         $model = "App\\Models\\" . ucfirst($type);
@@ -66,8 +76,23 @@ class PhotoController extends Controller
 
         return response()->json($photos);
     }
+    
+    // Lister les photos d’une consultation spécifique
+    public function listByConsultation($id)
+    {
+        $consultation = Consultation::find($id);
 
-    // 📌 Supprimer une photo
+        if (!$consultation) {
+            return response()->json(['error' => 'Consultation non trouvée'], 200);
+        }
+
+        // Retourne toutes les photos liées à cette consultation
+        return response()->json($consultation->photos()->orderBy('created_at', 'desc')->get());
+    }
+
+
+
+    // Supprimer une photo
     public function delete($id)
     {
         $photo = Photo::findOrFail($id);

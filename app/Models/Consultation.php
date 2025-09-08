@@ -3,6 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Photo;
+use App\Models\User;
+use App\Models\Traitement;
+use App\Models\Stock;
+use App\Models\Paiement;
+use App\Models\Antecedent;
 
 class Consultation extends Model
 {
@@ -46,4 +52,9 @@ class Consultation extends Model
         return $this->belongsToMany(Antecedent::class, 'consultation_antecedent')
                     ->withTimestamps();
     }
+    public function photos()
+    {
+        return $this->morphMany(Photo::class, 'photoable');
+    }
+
 }

@@ -66,8 +66,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::middleware('auth:sanctum')->prefix('photos')->group(function () {
     Route::post('/upload', [PhotoController::class, 'upload']);
-    Route::get('/{type}/{id}', [PhotoController::class, 'listByOwner']); // type = user/patient
     Route::delete('/{id}', [PhotoController::class, 'delete']);
+    Route::get('consultations/{id}/photos', [PhotoController::class, 'listByConsultation']);
+
     });
 
 });
