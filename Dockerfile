@@ -49,7 +49,8 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache\n\
 # On attend que la DB soit prête, puis on migre et on seed\n\
 # CORRECTION : Utilisation de --class=Admin car votre fichier se nomme Admin.php\n\
 php artisan migrate --force\n\
-php artisan db:seed --class=Admin --force\n\
+php artisan db:seed --class=DatabaseSeeder --force\n\
+php artisan db:seed --class=RoleSeeder --force\n\
 php artisan storage:link\n\
 \n\
 # On vide les caches pour éviter les erreurs de config\n\
