@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
                 'role_id' => $adminRole?->id,
             ]
         );
-
+        $this->command->info('Les utilisateurs Admin et Test ont été créés avec succès !');
         // 3. Création ou mise à jour de l'utilisateur de test
         User::updateOrCreate(
             ['email' => 'test@example.com'], // Condition de recherche (unique)
